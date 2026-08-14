@@ -12,6 +12,22 @@ from openai.lib._pydantic import to_strict_json_schema
 from .schema_types.query import Query
 
 
+def test_extra_allow_schema_disables_additional_properties() -> None:
+    if PYDANTIC_V1:
+        return
+
+    from pydantic import ConfigDict
+
+    class ExtraAllowModel(BaseModel):
+        model_config = ConfigDict(extra="allow")
+
+        field: str
+
+    schema = to_strict_json_schema(ExtraAllowModel)
+
+    assert schema["additionalProperties"] is False
+
+
 def test_most_types() -> None:
     if not PYDANTIC_V1:
         assert openai.pydantic_function_tool(Query)["function"] == snapshot(
