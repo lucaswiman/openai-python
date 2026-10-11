@@ -60,7 +60,8 @@ def test_mapping_schema_matches_responses_without_mutating_tools() -> None:
     tool = pydantic_function_tool(WithMap, handler=lambda args: args.value)
     parameters = tool.definition["parameters"]
     schema = _assert_matches_responses(WithMap)
-    assert schema["properties"]["value"]["additionalProperties"] == {"type": "string"}
+    # The fork closes all object schemas, including dictionary fields.
+    assert schema["properties"]["value"]["additionalProperties"] is False
     assert tool.definition["parameters"] == parameters
     assert tool({"value": {"label": "example"}}) == '{"label":"example"}'
 
